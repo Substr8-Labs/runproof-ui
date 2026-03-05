@@ -229,7 +229,7 @@ export default function VerifyPage() {
       {/* Footer */}
       <footer className="border-t border-gray-800 px-6 py-8">
         <div className="max-w-4xl mx-auto text-center text-sm text-gray-500">
-          <p>Substr8 — Governance infrastructure for AI agents</p>
+          <p>Substr8 Labs — Governance infrastructure for AI agents</p>
           <p className="mt-1">© 2026 Substr8 Labs</p>
         </div>
       </footer>
