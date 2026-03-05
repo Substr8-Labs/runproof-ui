@@ -77,7 +77,7 @@ export default function VerifyPage() {
       <header className="border-b border-gray-800 px-6 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <a href="https://substr8labs.com" className="text-xl font-bold">
-            Substr8
+            Substr8 Labs
           </a>
           <nav className="flex gap-6 text-sm text-gray-400">
             <a href="https://docs.substr8labs.com" className="hover:text-white">Docs</a>
