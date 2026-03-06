@@ -80,7 +80,7 @@ export default function VerifyPage() {
             Substr8 Labs
           </a>
           <nav className="flex gap-6 text-sm text-gray-400">
-            <a href="https://github.com/Substr8-Labs/whitepapers" className="hover:text-white">Docs</a>
+            <a href="https://docs.substr8labs.com" className="hover:text-white">Docs</a>
             <a href="https://github.com/Substr8-Labs" className="hover:text-white">GitHub</a>
           </nav>
         </div>
