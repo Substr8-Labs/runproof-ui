@@ -54,24 +54,39 @@ export default function VerifyPage() {
 
     try {
       const content = await file.text()
-      const proof = JSON.parse(content)
+      console.log('[RunProof] File content length:', content.length)
       
+      let proof
+      try {
+        proof = JSON.parse(content)
+        console.log('[RunProof] Parsed proof_id:', proof?.header?.proof_id)
+      } catch (parseErr) {
+        console.error('[RunProof] JSON parse error:', parseErr)
+        setError('Invalid JSON file - could not parse')
+        setResult(null)
+        return
+      }
+      
+      console.log('[RunProof] Sending to:', `${API_URL}/verify`)
       const res = await fetch(`${API_URL}/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ proof }),
       })
       
+      console.log('[RunProof] Response status:', res.status)
       const data = await res.json()
+      console.log('[RunProof] Response data:', data)
       
       if (!res.ok) {
-        setError(data.error || 'Verification failed')
+        setError(data.detail || data.error || 'Verification failed')
         setResult(null)
       } else {
         setResult(data)
       }
     } catch (e) {
-      setError('Invalid JSON file or verification failed')
+      console.error('[RunProof] Error:', e)
+      setError(`Error: ${e instanceof Error ? e.message : 'Unknown error'}`)
       setResult(null)
     } finally {
       setLoading(false)
