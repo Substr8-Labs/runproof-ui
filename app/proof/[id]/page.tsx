@@ -73,7 +73,7 @@ export default function ProofPage() {
   useEffect(() => {
     async function fetchProof() {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_VERIFY_API_URL || 'http://localhost:8000'
+        const API_URL = process.env.NEXT_PUBLIC_RUNPROOF_API_URL || 'http://localhost:8000'
         const res = await fetch(`${API_URL}/proof/${proofId}`)
         if (!res.ok) {
           throw new Error('Proof not found')
