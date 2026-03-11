@@ -67,8 +67,8 @@ export default function VerifyPage() {
         return
       }
       
-      console.log('[RunProof] Sending to:', `${API_URL}/verify`)
-      const res = await fetch(`${API_URL}/verify`, {
+      console.log('[RunProof] Sending to:', `/api/runproof`)
+      const res = await fetch(`/api/runproof`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ proof }),
