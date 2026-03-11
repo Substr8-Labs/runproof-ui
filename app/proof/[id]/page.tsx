@@ -166,7 +166,7 @@ export default function ProofPage() {
         {activeTab === 'summary' && <SummaryView data={data.summary} />}
         {activeTab === 'timeline' && <TimelineView data={data.timeline} technical={technicalMode} />}
         {activeTab === 'lineage' && <LineageView data={data.lineage} />}
-        {activeTab === 'report' && <ReportView data={data.report} technical={technicalMode} />}
+        {activeTab === 'report' && <ReportView data={data.report} />}
       </main>
     </div>
   )
@@ -239,24 +239,28 @@ function LineageView({ data }: { data: Lineage }) {
   )
 }
 
-function ReportView({ data, technical }: { data: Report; technical: boolean }) {
+function ReportView({ data }: { data: Report | null }) {
+  if (!data) {
+    return <div className="text-gray-400">Loading report...</div>
+  }
   const valid = data.overall_status === 'verified'
+  const checks = data.checks || []
   return (
     <div className="space-y-6">
       <div className={`p-4 rounded-lg ${valid ? 'bg-green-900/30' : 'bg-red-900/30'}`}>
-        <pre className="text-sm whitespace-pre-wrap">{data.human_summary}</pre>
+        <pre className="text-sm whitespace-pre-wrap">{data.human_summary || 'No summary available'}</pre>
       </div>
       <div className="text-sm text-gray-400">
-        {data.passed_count} passed, {data.failed_count} failed
+        {data.passed_count || 0} passed, {data.failed_count || 0} failed
       </div>
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Verification Checks</h3>
-        {data.checks?.map((check, i) => (
+        {checks.map((check, i) => (
           <div key={i} className="bg-gray-800 p-4 rounded-lg flex items-center gap-4">
             <span className="text-2xl">{check.status === 'passed' ? '✅' : '❌'}</span>
             <div className="flex-1">
-              <div className="font-medium capitalize">{check.name.replace('_', ' ')}</div>
-              <div className="text-gray-400 text-sm">{check.message}</div>
+              <div className="font-medium capitalize">{(check.name || '').replace('_', ' ')}</div>
+              <div className="text-gray-400 text-sm">{check.message || ''}</div>
             </div>
           </div>
         ))}
