@@ -21,9 +21,10 @@ function isVerified(status: string): boolean {
 
 interface TimelineEvent {
   seq: number
-  type: string
+  event_type: string
   timestamp: string
   entry_hash: string
+  payload_summary?: string
   payload?: Record<string, unknown>
 }
 
@@ -204,16 +205,14 @@ function TimelineView({ data, technical }: { data: Timeline; technical: boolean 
             <span className="bg-gray-700 px-2 py-1 rounded text-sm font-mono">#{event.seq}</span>
             <div className="flex-1">
               <div className="flex justify-between items-start">
-                <span className="font-medium text-green-400">{event.type}</span>
+                <span className="font-medium text-green-400">{event.event_type}</span>
                 <span className="text-gray-500 text-sm">{new Date(event.timestamp).toLocaleTimeString()}</span>
               </div>
+              {event.payload_summary && (
+                <div className="text-gray-300 text-sm mt-1">{event.payload_summary}</div>
+              )}
               {technical && event.entry_hash && (
                 <div className="text-gray-500 text-xs font-mono mt-1">{event.entry_hash.substring(0, 40)}...</div>
-              )}
-              {event.payload && (
-                <pre className="text-gray-400 text-xs mt-2 bg-gray-900 p-2 rounded overflow-x-auto">
-                  {JSON.stringify(event.payload, null, 2)}
-                </pre>
               )}
             </div>
           </div>
