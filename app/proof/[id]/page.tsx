@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 
-// Types for the 4 views
 interface Summary {
   proof_id: string
   run_id: string
@@ -73,8 +72,8 @@ export default function ProofPage() {
   useEffect(() => {
     async function fetchProof() {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_RUNPROOF_API_URL || 'https://api.runproof.substr8labs.com'
-        const res = await fetch(`${API_URL}/proof/${proofId}`)
+        // Use local proxy route
+        const res = await fetch(`/api/proof/${proofId}`)
         if (!res.ok) {
           throw new Error('Proof not found')
         }
@@ -117,7 +116,6 @@ export default function ProofPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header */}
       <header className="border-b border-gray-800 p-4">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div>
@@ -134,14 +132,11 @@ export default function ProofPage() {
               />
               Technical Mode
             </label>
-            <a href="/" className="text-blue-400 hover:underline text-sm">
-              ← Verify Another
-            </a>
+            <a href="/" className="text-blue-400 hover:underline text-sm">← Verify Another</a>
           </div>
         </div>
       </header>
 
-      {/* Tabs */}
       <nav className="border-b border-gray-800">
         <div className="max-w-6xl mx-auto flex">
           {tabs.map((tab) => (
@@ -160,7 +155,6 @@ export default function ProofPage() {
         </div>
       </nav>
 
-      {/* Content */}
       <main className="max-w-6xl mx-auto p-6">
         {activeTab === 'summary' && <SummaryView data={data.summary} />}
         {activeTab === 'timeline' && <TimelineView data={data.timeline} technical={technicalMode} />}
@@ -171,63 +165,45 @@ export default function ProofPage() {
   )
 }
 
-// Summary View Component
 function SummaryView({ data }: { data: Summary }) {
   return (
     <div className="space-y-6">
-      {/* Status Card */}
       <div className={`p-6 rounded-lg ${data.valid ? 'bg-green-900/30 border border-green-700' : 'bg-red-900/30 border border-red-700'}`}>
         <div className="flex items-center gap-4">
           <span className="text-5xl">{data.valid ? '✅' : '❌'}</span>
           <div>
             <h2 className="text-2xl font-bold">{data.valid ? 'Valid RunProof' : 'Invalid RunProof'}</h2>
-            <p className="text-gray-400">
-              {data.valid ? 'All cryptographic checks passed' : 'Verification failed'}
-            </p>
+            <p className="text-gray-400">{data.valid ? 'All cryptographic checks passed' : 'Verification failed'}</p>
           </div>
         </div>
       </div>
-
-      {/* Details Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <DetailCard label="Proof ID" value={data.proof_id} mono />
         <DetailCard label="Run ID" value={data.run_id} mono />
         <DetailCard label="Agent" value={data.agent_id} />
         <DetailCard label="Runtime" value={data.runtime} />
         <DetailCard label="Status" value={data.status} />
-        <DetailCard label="Events" value={data.event_count.toString()} />
-        <DetailCard label="Started" value={new Date(data.started_at).toLocaleString()} />
-        <DetailCard label="Ended" value={data.ended_at ? new Date(data.ended_at).toLocaleString() : '-'} />
+        <DetailCard label="Events" value={String(data.event_count)} />
       </div>
     </div>
   )
 }
 
-// Timeline View Component
 function TimelineView({ data, technical }: { data: Timeline; technical: boolean }) {
   return (
     <div className="space-y-4">
       <div className="text-gray-400 text-sm">{data.total_events} events</div>
       <div className="space-y-2">
         {data.events.map((event, i) => (
-          <div
-            key={i}
-            className="bg-gray-800 p-4 rounded-lg flex items-start gap-4"
-          >
-            <span className="bg-gray-700 px-2 py-1 rounded text-sm font-mono">
-              #{event.seq}
-            </span>
+          <div key={i} className="bg-gray-800 p-4 rounded-lg flex items-start gap-4">
+            <span className="bg-gray-700 px-2 py-1 rounded text-sm font-mono">#{event.seq}</span>
             <div className="flex-1">
               <div className="flex justify-between items-start">
                 <span className="font-medium text-green-400">{event.type}</span>
-                <span className="text-gray-500 text-sm">
-                  {new Date(event.timestamp).toLocaleTimeString()}
-                </span>
+                <span className="text-gray-500 text-sm">{new Date(event.timestamp).toLocaleTimeString()}</span>
               </div>
               {technical && event.entry_hash && (
-                <div className="text-gray-500 text-xs font-mono mt-1">
-                  {event.entry_hash.substring(0, 40)}...
-                </div>
+                <div className="text-gray-500 text-xs font-mono mt-1">{event.entry_hash.substring(0, 40)}...</div>
               )}
               {event.payload && (
                 <pre className="text-gray-400 text-xs mt-2 bg-gray-900 p-2 rounded overflow-x-auto">
@@ -242,80 +218,31 @@ function TimelineView({ data, technical }: { data: Timeline; technical: boolean 
   )
 }
 
-// Lineage View Component
 function LineageView({ data }: { data: Lineage }) {
   return (
     <div className="space-y-6">
-      {/* Current Proof */}
       <div className="bg-gray-800 p-4 rounded-lg border-2 border-green-600">
         <div className="text-sm text-gray-400">Current Proof</div>
         <div className="font-mono text-green-400">{data.proof_id}</div>
         <div className="text-sm text-gray-500 mt-1">Depth: {data.depth}</div>
       </div>
-
-      {/* Tree Structure */}
-      <div className="space-y-4">
-        {data.root && (
-          <div className="ml-4">
-            <div className="text-gray-400 text-sm">Root</div>
-            <div className="bg-gray-800 p-3 rounded font-mono text-sm">{data.root}</div>
-          </div>
-        )}
-        
-        {data.parent && (
-          <div className="ml-8">
-            <div className="text-gray-400 text-sm">↑ Parent</div>
-            <div className="bg-gray-800 p-3 rounded font-mono text-sm">{data.parent}</div>
-          </div>
-        )}
-
-        {data.workflow_id && (
-          <div className="mt-4">
-            <div className="text-gray-400 text-sm">Workflow ID</div>
-            <div className="bg-gray-800 p-3 rounded font-mono text-sm">{data.workflow_id}</div>
-          </div>
-        )}
-
-        {data.children.length > 0 && (
-          <div className="ml-8 mt-4">
-            <div className="text-gray-400 text-sm">↓ Children ({data.children.length})</div>
-            {data.children.map((child, i) => (
-              <div key={i} className="bg-gray-800 p-3 rounded font-mono text-sm mt-2">
-                {child}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {!data.parent && !data.root && data.children.length === 0 && (
-          <div className="text-gray-500 text-center py-8">
-            This is a standalone proof with no lineage.
-          </div>
-        )}
-      </div>
+      {!data.parent && !data.root && data.children.length === 0 && (
+        <div className="text-gray-500 text-center py-8">This is a standalone proof with no lineage.</div>
+      )}
     </div>
   )
 }
 
-// Report View Component
 function ReportView({ data, technical }: { data: Report; technical: boolean }) {
   return (
     <div className="space-y-6">
-      {/* Summary */}
       <div className={`p-4 rounded-lg ${data.valid ? 'bg-green-900/30' : 'bg-red-900/30'}`}>
-        <p className="text-lg">
-          {technical ? data.technical_summary : data.human_summary}
-        </p>
+        <p className="text-lg">{technical ? data.technical_summary : data.human_summary}</p>
       </div>
-
-      {/* Checks */}
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Verification Checks</h3>
         {data.checks.map((check, i) => (
-          <div
-            key={i}
-            className="bg-gray-800 p-4 rounded-lg flex items-center gap-4"
-          >
+          <div key={i} className="bg-gray-800 p-4 rounded-lg flex items-center gap-4">
             <span className="text-2xl">{check.passed ? '✅' : '❌'}</span>
             <div className="flex-1">
               <div className="font-medium">{check.name}</div>
@@ -328,12 +255,11 @@ function ReportView({ data, technical }: { data: Report; technical: boolean }) {
   )
 }
 
-// Helper Component
 function DetailCard({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="bg-gray-800 p-4 rounded-lg">
       <div className="text-gray-400 text-sm">{label}</div>
-      <div className={`text-white ${mono ? 'font-mono text-sm' : ''}`}>{value}</div>
+      <div className={`text-white ${mono ? 'font-mono text-sm' : ''}`}>{value || '-'}</div>
     </div>
   )
 }
