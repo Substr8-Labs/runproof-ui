@@ -22,7 +22,7 @@ export default function VerifyPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const API_URL = process.env.NEXT_PUBLIC_RUNPROOF_API_URL || 'https://api.runproof.substr8labs.com'
+  const API_URL = process.env.NEXT_PUBLIC_RUNPROOF_API_URL || 'https://srv1338949.tail2b522f.ts.net'
 
   const handleVerifyHash = async () => {
     if (!hash.trim()) return
