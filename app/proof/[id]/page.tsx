@@ -9,10 +9,14 @@ interface Summary {
   agent_id: string
   runtime: string
   status: string
-  valid: boolean
   event_count: number
   started_at: string
   ended_at: string
+}
+
+// Helper to check if verified
+function isVerified(status: string): boolean {
+  return status === 'verified'
 }
 
 interface TimelineEvent {
@@ -166,14 +170,15 @@ export default function ProofPage() {
 }
 
 function SummaryView({ data }: { data: Summary }) {
+  const valid = isVerified(data.status)
   return (
     <div className="space-y-6">
-      <div className={`p-6 rounded-lg ${data.valid ? 'bg-green-900/30 border border-green-700' : 'bg-red-900/30 border border-red-700'}`}>
+      <div className={`p-6 rounded-lg ${valid ? 'bg-green-900/30 border border-green-700' : 'bg-red-900/30 border border-red-700'}`}>
         <div className="flex items-center gap-4">
-          <span className="text-5xl">{data.valid ? '✅' : '❌'}</span>
+          <span className="text-5xl">{valid ? '✅' : '❌'}</span>
           <div>
-            <h2 className="text-2xl font-bold">{data.valid ? 'Valid RunProof' : 'Invalid RunProof'}</h2>
-            <p className="text-gray-400">{data.valid ? 'All cryptographic checks passed' : 'Verification failed'}</p>
+            <h2 className="text-2xl font-bold">{valid ? 'Valid RunProof' : 'Invalid RunProof'}</h2>
+            <p className="text-gray-400">{valid ? 'All cryptographic checks passed' : 'Verification failed'}</p>
           </div>
         </div>
       </div>
