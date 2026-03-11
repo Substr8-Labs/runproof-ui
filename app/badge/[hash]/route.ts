@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 // SVG badge generator for RunProof verification
-// Usage: ![Verified](https://verify.substr8labs.com/badge/<hash>)
+// Usage: ![Verified](https://runproof.substr8labs.com/badge/<hash>)
 
 export async function GET(
   request: NextRequest,
