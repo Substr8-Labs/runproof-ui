@@ -44,8 +44,9 @@ interface Lineage {
 
 interface ReportCheck {
   name: string
-  status: string
-  message: string
+  status?: string
+  passed?: boolean
+  message?: string
   details?: Record<string, unknown>
 }
 
@@ -243,21 +244,24 @@ function ReportView({ data }: { data: Report | null }) {
   if (!data) {
     return <div className="text-gray-400">Loading report...</div>
   }
-  const valid = data.overall_status === 'verified'
   const checks = data.checks || []
+  // Compute counts from checks array (handle both `passed` boolean and `status` string)
+  const passedCount = checks.filter(c => c.passed || c.status === 'passed').length
+  const failedCount = checks.length - passedCount
+  const valid = passedCount > 0 && failedCount === 0
   return (
     <div className="space-y-6">
       <div className={`p-4 rounded-lg ${valid ? 'bg-green-900/30' : 'bg-red-900/30'}`}>
-        <pre className="text-sm whitespace-pre-wrap">{data.human_summary || 'No summary available'}</pre>
+        <pre className="text-sm whitespace-pre-wrap">{valid ? 'All verification checks passed ✓' : (data.human_summary || 'Verification incomplete')}</pre>
       </div>
       <div className="text-sm text-gray-400">
-        {data.passed_count || 0} passed, {data.failed_count || 0} failed
+        {passedCount} passed, {failedCount} failed
       </div>
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">Verification Checks</h3>
         {checks.map((check, i) => (
           <div key={i} className="bg-gray-800 p-4 rounded-lg flex items-center gap-4">
-            <span className="text-2xl">{check.status === 'passed' ? '✅' : '❌'}</span>
+            <span className="text-2xl">{(check.passed || check.status === 'passed') ? '✅' : '❌'}</span>
             <div className="flex-1">
               <div className="font-medium capitalize">{(check.name || '').replace('_', ' ')}</div>
               <div className="text-gray-400 text-sm">{check.message || ''}</div>
