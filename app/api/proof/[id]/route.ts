@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const API_URL = process.env.RUNPROOF_API_URL || 'https://api.runproof.substr8labs.com'
+const API_URL = process.env.RUNPROOF_API_URL || 'https://runproof-api-production.up.railway.app'
 
 export async function GET(
   request: NextRequest,
