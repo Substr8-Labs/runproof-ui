@@ -7,35 +7,36 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   const proofId = params.id
-  const url = `${API_URL}/proof/${proofId}`
-  
-  console.log('[Proxy] Fetching proof from:', url)
-  
+
   try {
-    const res = await fetch(url, {
-      headers: {
-        'Accept': 'application/json',
-      },
-    })
-    
-    console.log('[Proxy] Response status:', res.status)
-    
-    if (!res.ok) {
-      const text = await res.text()
-      console.log('[Proxy] Error response:', text)
+    // Fetch both inspect and verify in parallel
+    const [inspectRes, verifyRes] = await Promise.all([
+      fetch(`${API_URL}/v1/proof/${proofId}/inspect`, {
+        headers: { 'Accept': 'application/json' },
+      }),
+      fetch(`${API_URL}/v1/runproof/${proofId}/verify`, {
+        headers: { 'Accept': 'application/json' },
+      }),
+    ])
+
+    const inspectData = inspectRes.ok ? await inspectRes.json() : null
+    const verifyData = verifyRes.ok ? await verifyRes.json() : null
+
+    if (!inspectData && !verifyData) {
       return NextResponse.json(
-        { error: 'Proof not found', detail: text },
-        { status: res.status }
+        { error: 'Proof not found' },
+        { status: inspectRes.status }
       )
     }
-    
-    const data = await res.json()
-    return NextResponse.json(data)
+
+    return NextResponse.json({
+      inspect: inspectData,
+      verify: verifyData,
+    })
   } catch (e) {
     const err = e instanceof Error ? e.message : String(e)
-    console.error('[Proxy] Exception:', err)
     return NextResponse.json(
-      { error: 'Failed to fetch proof', detail: err, url },
+      { error: 'Failed to fetch proof', detail: err },
       { status: 500 }
     )
   }
